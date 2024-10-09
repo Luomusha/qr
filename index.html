@@ -4,16 +4,59 @@
 <head>
     <meta charset="utf-8" />
     <title>hello-wasm example</title>
+    <style>
+        html,
+        body {
+            padding: 0;
+            margin: 0;
+            font-size: 0;
+        }
+        img {
+            display: none;
+            filter: grayscale(1) blur(1px);
+        }
+        
+        canvas {
+            display: inline-block;
+            position: absolute;
+            /* width: 50%; */
+        }
+        canvas:first-of-type  {
+            filter: grayscale(1) blur(1px);
+        }
+        canvas+canvas {
+            display: none;
+        }
+    </style>
 </head>
 
 <body>
-    <h1>qr</h1>
+    <img src="2.jpeg" alt="">
+    <canvas></canvas>
+    <canvas id="r"></canvas>
     <script type="module">
-        import init, { greet } from "./pkg/qr.js";
-        console.log(init)
-        init().then(() => {
-            greet("WebAssembly");
-        });
+        import init, { process_image_data } from "./pkg/qr.js";
+        window.onload = () => {
+            const img = document.querySelector('img');
+            const canvas = document.querySelector('canvas');
+            const result = document.querySelector('#r');
+            const rctx = result.getContext('2d');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            result.width = img.width;
+            result.height = img.height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0);
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            console.log(imageData);
+            const uint8Array = new Uint8Array(imageData.data.buffer);
+
+            init().then(() => {
+                const processedImageData = process_image_data(imageData.data, canvas.width, canvas.height);
+                console.log(processedImageData)
+                rctx.putImageData(processedImageData, 0, 0);
+            })
+        }
     </script>
 </body>
 

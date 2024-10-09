@@ -6,7 +6,7 @@ Rust wasm qr scanner
 ## build
 
 ```
-wasm-pack build --release --target web.
+wasm-pack build --release --target web
 ```
 
 ## publish
